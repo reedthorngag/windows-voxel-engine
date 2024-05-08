@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "C:/lib/glew/include",
                 "C:/lib/glm",
-                "C:/lib/glfw/include"
+                "C:/lib/glfw/include",
+                "C:/lib"
             ],
             "defines": [
                 "_DEBUG",

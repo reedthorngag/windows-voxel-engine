@@ -1,9 +1,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <stdio.h>
 
 #include "shaders/load_shader.hpp"
+#include "camera.hpp"
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -30,19 +34,49 @@ Block models[] = {
     }
 };
 
-float vertices[] = {
-    (float)0,
-    (float)0x6000
+// float[n][0] => pos, first 10 bits is x, next 10 is y and last 12 is z
+// float[n][1] => data, first 12 bits are block/model id, next 2 is the plane (0 = top, 1 = side, 2 = front)
+//                  last bit is if its the positive or negative face of that plane
+//                  remaining 17 bits are currently unused
+float faces[][2] = {
+    {
+        (float)0,
+        (float)0x6000
+    }
 };
+
+Camera* camera;
 
 void glfwErrorCallback(int errorCode, const char* errorMessage) {
     printf("glfw error: %d %s\n", errorCode, errorMessage);
 }
 
+const float speed = 0.2;
+const float speed_scale = 3;
 void glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    glm::vec3 move_speed = glm::vec3(speed,speed,speed) * glm::vec3((mods?speed_scale:1));
+
     switch (key) {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window,true);
+            break;
+        case 87: // W
+            camera->move(camera->direction * move_speed);
+            break;
+        case 83: // S
+            camera->move(-(camera->direction * move_speed));
+            break;
+        case 65: // A
+            camera->move(glm::cross(glm::vec3(0,1,0),camera->direction) * move_speed);
+            break;
+        case 68: // D
+            camera->move(glm::cross(glm::vec3(0,1,0),-camera->direction) * move_speed);
+            break;
+        default:
+            if (action == 0) {
+                printf("\rKey pressed: %d mods: %d   ",key, mods);
+                fflush(stdout);
+            }
             break;
     }
 }
@@ -54,6 +88,10 @@ void render() {
 
     glClearColor(1,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    camera->updateUniforms();
+
+    glUniformMatrix4fv(glGetUniformLocation(program, "chunkOffset"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0),glm::vec3(0))));
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER,VBO);
@@ -159,7 +197,7 @@ int main() {
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(faces), faces, GL_STATIC_DRAW);
     glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, 2*sizeof(GL_FLOAT), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1,1,GL_FLOAT, GL_FALSE, 2*sizeof(GL_FLOAT), (void*)sizeof(GL_FLOAT));
@@ -174,6 +212,7 @@ int main() {
 
     glUniformBlockBinding(program,glGetUniformBlockIndex(program,"modelData"),0);
 
+    camera = new Camera(program,glm::vec3(0,0,-3));
 
     int width,height;
     glfwGetFramebufferSize(win,&width,&height);

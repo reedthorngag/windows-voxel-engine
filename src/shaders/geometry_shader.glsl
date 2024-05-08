@@ -9,10 +9,12 @@ struct Model {
 };
 
 layout(std140) uniform modelData {
-    Model[] models;
+    Model[4096] models;
 };
 
-uniform mat4 camera;
+//uniform mat4 camera;
+uniform mat4 projection;
+uniform mat4 view;
 uniform mat4 chunkOffset;
 
 out vec3 color;
@@ -26,7 +28,8 @@ void main() {
     uint face_data = (data>>12) & 0x7;
     // 17 bits left over currently
 
-    float plane_offset = ((face_data>>2) & 0x1) - 0.5;
+    // dont need bit mask because face_data only has 3 set bits
+    float plane_offset = (face_data>>2) - 0.5;
     uint plane_index = face_data & 0x3;
 
     mat4 planes[3] = mat4[](
@@ -56,22 +59,22 @@ void main() {
     plane[2][plane_index] = plane_offset;
     plane[3][plane_index] = plane_offset;
 
-    color = models[1].color;
+    color = models[model_id].color;
 
-    //mat4 thingy =  camera * chunkOffset;
+    mat4 thingy = projection * view * chunkOffset;
 
     vec4 in_pos = vec4(gl_in[0].gl_Position.xyz,1);
 
-    gl_Position = (plane[0] + in_pos);
+    gl_Position = thingy * (plane[0] + in_pos);
     EmitVertex();
 
-    gl_Position = (plane[1] + in_pos);
+    gl_Position = thingy * (plane[1] + in_pos);
     EmitVertex();
 
-    gl_Position = (plane[2] + in_pos);
+    gl_Position = thingy * (plane[2] + in_pos);
     EmitVertex();
 
-    gl_Position = (plane[3] + in_pos);
+    gl_Position = thingy * (plane[3] + in_pos);
     EmitVertex();
 
     EndPrimitive();
