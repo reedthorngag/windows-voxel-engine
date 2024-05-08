@@ -27,15 +27,11 @@ Block models[] = {
     Block{
         {1,1,1},
         0
-    },
-    Block{
-        {1,0,1},
-        0
     }
 };
 
-unsigned char vertices[][4] = {
-    {0,0,0,0}
+float vertices[1] = {
+    0.8
 };
 
 void glfwErrorCallback(int errorCode, const char* errorMessage) {
@@ -49,13 +45,8 @@ void glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int
             break;
     }
 }
-
-void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    
-}
-
+void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
 void glfwMousePosCallback(GLFWwindow* window, double x, double y) {}
-
 
 
 void render() {
@@ -64,7 +55,9 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER,VBO);
     glDrawArrays(GL_POINTS, 0, 1);
+    glBindVertexArray(0);
 
 }
 
@@ -166,9 +159,9 @@ int main() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0,1,GL_UNSIGNED_INT, GL_FALSE, sizeof(GL_UNSIGNED_INT), 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
+    glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT), (void*)0);
+    glEnableVertexAttribArray(0);
+
     glBindVertexArray(0);
 
 
