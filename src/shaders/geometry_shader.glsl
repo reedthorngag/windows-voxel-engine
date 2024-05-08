@@ -23,11 +23,11 @@ void main() {
 
     uint model_id = data & 0xfff;
 
-    uint face_data = 2;//(data>>12) & 0x7;
+    uint face_data = (data>>12) & 0x7;
     // 17 bits left over currently
 
-    float plane_offset =  (face_data & 0x4) - 0.5;
-    uint plane_index = face_data & 0x3; // 0 1 or 2
+    float plane_offset = ((face_data>>2) & 0x1) - 0.5;
+    uint plane_index = face_data & 0x3;
 
     mat4 planes[3] = mat4[](
         mat4( // side plane
@@ -57,7 +57,6 @@ void main() {
     plane[3][plane_index] = plane_offset;
 
     color = models[1].color;
-    color.z = data;
 
     //mat4 thingy =  camera * chunkOffset;
 

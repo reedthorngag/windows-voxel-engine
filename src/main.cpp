@@ -30,8 +30,9 @@ Block models[] = {
     }
 };
 
-float vertices[1] = {
-    0.8
+float vertices[] = {
+    (float)0,
+    (float)0x6000
 };
 
 void glfwErrorCallback(int errorCode, const char* errorMessage) {
@@ -159,8 +160,10 @@ int main() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT), (void*)0);
+    glVertexAttribPointer(0,1,GL_FLOAT, GL_FALSE, 2*sizeof(GL_FLOAT), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1,1,GL_FLOAT, GL_FALSE, 2*sizeof(GL_FLOAT), (void*)sizeof(GL_FLOAT));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
