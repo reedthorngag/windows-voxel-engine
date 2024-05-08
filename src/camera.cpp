@@ -19,19 +19,19 @@ Camera::~Camera() {
 
 }
 
-void Camera::rotateX(int degrees) {
+void Camera::rotateX(float degrees) {
     this->updated = true;
     this->rotationY += degrees;  // because its around, not along, that axis
     this->direction = glm::rotateX(glm::vec3(0,0,1),glm::radians((float)this->rotationX));
     this->direction = glm::rotateY(this->direction,glm::radians((float)this->rotationY));
 }
 
-void Camera::rotateY(int degrees) {
+void Camera::rotateY(float degrees) {
     this->updated = true;
     if (this->rotationX+degrees <= -90 || this->rotationX+degrees >= 90) return;
     this->rotationX += degrees; // because its around, not along, that axis
-    this->direction = glm::rotateX(glm::vec3(0,0,1),glm::radians((float)this->rotationX));
-    this->direction = glm::rotateY(this->direction,glm::radians((float)this->rotationY));
+    this->direction = glm::rotateX(glm::vec3(0,0,1),glm::radians(this->rotationX));
+    this->direction = glm::rotateY(this->direction,glm::radians(this->rotationY));
 }
 
 
@@ -58,17 +58,11 @@ void Camera::updateUniforms() {
         glm::vec3(0,1,0)
     );
 	
-    // glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 500.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 500.0f);
 
-    // glm::mat4 camera = projection * view;
+    glm::mat4 camera = projection * view;
 
-	// glUniformMatrix4fv(glGetUniformLocation(this->program, "camera"), 1, GL_FALSE, glm::value_ptr(camera));
-
-    unsigned int lookAt = glGetUniformLocation(this->program,"view");
-	glUniformMatrix4fv(lookAt, 1, GL_FALSE, glm::value_ptr(view));
-	
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 500.0f);
-	glUniformMatrix4fv(glGetUniformLocation(this->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(this->program, "camera"), 1, GL_FALSE, glm::value_ptr(camera));
 
 }
 

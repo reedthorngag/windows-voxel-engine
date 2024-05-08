@@ -9,14 +9,14 @@ class Camera {
         glm::vec3 pos;
         glm::vec3 origin;
         glm::vec3 direction = glm::vec3(0,0,1);
-        int rotationX = 0;
-        int rotationY = 0;
+        float rotationX = 0;
+        float rotationY = 0;
         glm::mat4 perspective;
         GLuint program;
         bool updated;
 
-        void rotateX(int degrees);
-        void rotateY(int degrees);
+        void rotateX(float degrees);
+        void rotateY(float degrees);
 
         void move(glm::vec3 movement);
 

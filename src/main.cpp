@@ -8,9 +8,13 @@
 
 #include "shaders/load_shader.hpp"
 #include "camera.hpp"
+#include "input.hpp"
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
+
+const double HALF_WIDTH = WIDTH/2.0;
+const double HALF_HEIGHT = HEIGHT/2.0;
 
 GLFWwindow* win;
 GLuint program;
@@ -46,6 +50,7 @@ float faces[][2] = {
 };
 
 Camera* camera;
+Input input;
 
 void glfwErrorCallback(int errorCode, const char* errorMessage) {
     printf("glfw error: %d %s\n", errorCode, errorMessage);
@@ -56,37 +61,49 @@ const float speed_scale = 3;
 void glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     glm::vec3 move_speed = glm::vec3(speed,speed,speed) * glm::vec3((mods?speed_scale:1));
 
-    switch (key) {
-        case GLFW_KEY_ESCAPE:
-            glfwSetWindowShouldClose(window,true);
-            break;
-        case 87: // W
-            camera->move(camera->direction * move_speed);
-            break;
-        case 83: // S
-            camera->move(-(camera->direction * move_speed));
-            break;
-        case 65: // A
-            camera->move(glm::cross(glm::vec3(0,1,0),camera->direction) * move_speed);
-            break;
-        case 68: // D
-            camera->move(glm::cross(glm::vec3(0,1,0),-camera->direction) * move_speed);
-            break;
-        default:
-            if (action == 0) {
+    if (action) {
+        switch (key) {
+            default:
+                input.press(key);
+                break;
+        }
+    } else {
+        switch (key) {
+            case GLFW_KEY_ESCAPE:
+                glfwSetWindowShouldClose(window,true);
+                break;
+            case 87: // W
+                camera->move(camera->direction * move_speed);
+                break;
+            case 83: // S
+                camera->move(-(camera->direction * move_speed));
+                break;
+            case 65: // A
+                camera->move(glm::cross(glm::vec3(0,1,0),camera->direction) * move_speed);
+                break;
+            case 68: // D
+                camera->move(glm::cross(glm::vec3(0,1,0),-camera->direction) * move_speed);
+                break;
+            default:
+                input.release(key);
                 printf("\rKey pressed: %d mods: %d   ",key, mods);
                 fflush(stdout);
-            }
-            break;
+                break;
+        }
     }
 }
 void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
-void glfwMousePosCallback(GLFWwindow* window, double x, double y) {}
+
+void glfwMousePosCallback(GLFWwindow* window, double x, double y) {
+    camera->rotateY((y-HALF_HEIGHT)*0.05);
+    camera->rotateX((HALF_WIDTH-x)*0.05);
+    glfwSetCursorPos(window,HALF_WIDTH,HALF_HEIGHT);
+}
 
 
 void render() {
 
-    glClearColor(1,0,0,1);
+    glClearColor(0.001,0.001,0.05,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     camera->updateUniforms();

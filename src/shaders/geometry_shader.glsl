@@ -12,9 +12,7 @@ layout(std140) uniform modelData {
     Model[4096] models;
 };
 
-//uniform mat4 camera;
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 camera;
 uniform mat4 chunkOffset;
 
 out vec3 color;
@@ -61,7 +59,7 @@ void main() {
 
     color = models[model_id].color;
 
-    mat4 thingy = projection * view * chunkOffset;
+    mat4 thingy = camera * chunkOffset;
 
     vec4 in_pos = vec4(gl_in[0].gl_Position.xyz,1);
 
