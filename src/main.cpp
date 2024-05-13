@@ -9,15 +9,8 @@
 #include "shaders/load_shader.hpp"
 #include "camera.hpp"
 #include "input.hpp"
-
-const int WIDTH = 800;
-const int HEIGHT = 600;
-
-const double HALF_WIDTH = WIDTH/2.0;
-const double HALF_HEIGHT = HEIGHT/2.0;
-
-GLFWwindow* win;
-GLuint program;
+#include "globals.hpp"
+#include "setup.hpp"
 
 #pragma pack(1)
 struct Block {
@@ -33,7 +26,7 @@ GLuint UBO;
 alignas(16)
 Block models[] = {
     Block{
-        {1,1,1},
+        {1,0.1,0},
         0
     }
 };
@@ -52,52 +45,16 @@ float faces[][2] = {
 Camera* camera;
 Input input;
 
-void glfwErrorCallback(int errorCode, const char* errorMessage) {
-    printf("glfw error: %d %s\n", errorCode, errorMessage);
+inline void glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    input.glfwCharCallback(window,key,scancode,action,mods);
 }
 
-const float speed = 0.2;
-const float speed_scale = 3;
-void glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    glm::vec3 move_speed = glm::vec3(speed,speed,speed) * glm::vec3((mods?speed_scale:1));
-
-    if (action) {
-        switch (key) {
-            default:
-                input.press(key);
-                break;
-        }
-    } else {
-        switch (key) {
-            case GLFW_KEY_ESCAPE:
-                glfwSetWindowShouldClose(window,true);
-                break;
-            case 87: // W
-                camera->move(camera->direction * move_speed);
-                break;
-            case 83: // S
-                camera->move(-(camera->direction * move_speed));
-                break;
-            case 65: // A
-                camera->move(glm::cross(glm::vec3(0,1,0),camera->direction) * move_speed);
-                break;
-            case 68: // D
-                camera->move(glm::cross(glm::vec3(0,1,0),-camera->direction) * move_speed);
-                break;
-            default:
-                input.release(key);
-                printf("\rKey pressed: %d mods: %d   ",key, mods);
-                fflush(stdout);
-                break;
-        }
-    }
+inline void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    input.glfwMouseButtonCallback(window,button,action,mods);
 }
-void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
 
-void glfwMousePosCallback(GLFWwindow* window, double x, double y) {
-    camera->rotateY((y-HALF_HEIGHT)*0.05);
-    camera->rotateX((HALF_WIDTH-x)*0.05);
-    glfwSetCursorPos(window,HALF_WIDTH,HALF_HEIGHT);
+inline void glfwMousePosCallback(GLFWwindow* window, double x, double y) {
+    input.glfwMousePosCallback(window,x,y);
 }
 
 
@@ -121,93 +78,14 @@ int main() {
     std::cout << "hello world!\n" << std::endl;
 
     if (sizeof(Block) != 16) {
-        printf("You fucking moron, you messed up the struct size, make it 16 byte aligned! struct size: %lld\n",sizeof(Block));
+        printf("You messed up the struct size, make it 16 byte aligned! struct size: %lld\n",sizeof(Block));
         return 1;
     }
 
-#pragma region setup
-    if (!glfwInit()) {
-        printf("GLFW init failed!\n");
-        return 1;
-    }
+    createWindow();
+    setupOpenGl();
 
-    glfwSetErrorCallback(glfwErrorCallback);
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    win = glfwCreateWindow(WIDTH, HEIGHT, "Voxel engine v2", NULL, NULL);
-    if (!win) {
-        printf("Window creation failed!\n");
-        return 1;
-    }
-
-    glfwMakeContextCurrent(win);
-
-    if (glewInit() != GLEW_OK) {
-        printf("GLEW init failed!\n");
-        return 1;
-    }
-
-    GLuint fragShader = loadShader("../src/shaders/frag_shader.glsl",GL_FRAGMENT_SHADER);
-    GLuint vertexShader = loadShader("../src/shaders/vertex_shader.glsl",GL_VERTEX_SHADER);
-    GLuint geometryShader = loadShader("../src/shaders/geometry_shader.glsl",GL_GEOMETRY_SHADER);
-
-    program = glCreateProgram();
-
-    glAttachShader(program,fragShader);
-    glAttachShader(program,vertexShader);
-    glAttachShader(program,geometryShader);
-    glLinkProgram(program);
-
-    GLint isLinked = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
-    if (isLinked == GL_FALSE)
-    {
-        GLint maxLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-        char* infoLog = new char[maxLength];
-        glGetProgramInfoLog(program, maxLength, &maxLength, infoLog);
-        printf("Linking failed! Info log: %s\n",infoLog);
-
-        delete[] infoLog;
-        glDeleteShader(fragShader);
-        glDeleteShader(vertexShader);
-        glDeleteShader(geometryShader);
-        glDeleteProgram(program);
-
-        exit(1);
-    }
-
-    glValidateProgram(program);
-
-    GLint isValid = 0;
-    glGetProgramiv(program, GL_VALIDATE_STATUS, (int *)&isValid);
-    if (isValid == GL_FALSE)
-    {
-        GLint maxLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-        char* infoLog = new char[maxLength];
-        glGetProgramInfoLog(program, maxLength, &maxLength, infoLog);
-        printf("Linking failed! Info log: %s\n",infoLog);
-
-        delete[] infoLog;
-        glDeleteShader(fragShader);
-        glDeleteShader(vertexShader);
-        glDeleteShader(geometryShader);
-        glDeleteProgram(program);
-
-        exit(1);
-    }
-
-    glDeleteShader(fragShader);
-    glDeleteShader(vertexShader);
-    glDeleteShader(geometryShader);
-
-    glEnable(GL_DEPTH_TEST);
     glUseProgram(program);
-#pragma endregion
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1,&VBO);
@@ -232,24 +110,24 @@ int main() {
     camera = new Camera(program,glm::vec3(0,0,-3));
 
     int width,height;
-    glfwGetFramebufferSize(win,&width,&height);
+    glfwGetFramebufferSize(window,&width,&height);
     glViewport(0,0,width,height);
 
-    glfwSetKeyCallback(win,glfwCharCallback);
-    glfwSetCursorPosCallback(win,glfwMousePosCallback);
-    glfwSetMouseButtonCallback(win, glfwMouseButtonCallback);
+    glfwSetKeyCallback(window,glfwCharCallback);
+    glfwSetCursorPosCallback(window,glfwMousePosCallback);
+    glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
 
     glfwSwapInterval(1);
 
-    while (!glfwWindowShouldClose(win)) {
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         render();
 
-        glfwSwapBuffers(win);
+        glfwSwapBuffers(window);
     }
 
-    glfwDestroyWindow(win);
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 
