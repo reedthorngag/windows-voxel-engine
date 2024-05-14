@@ -2,6 +2,9 @@
 #include "globals.hpp"
 #include "Player.hpp"
 
+extern GLuint program;
+extern Game game;
+
 Player::Player(glm::vec3 startPos) {
     this->pos = startPos;
     this->camera = new Camera(program, glm::vec3(0,this->height,0));

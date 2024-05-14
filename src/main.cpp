@@ -31,7 +31,7 @@ Block models[] = {
     }
 };
 
-// float[n][0] => pos, first 10 bits is x, next 10 is y and last 12 is z
+// float[n][0] => pos, first 10 bits is x, next 10 is y and last 10 is z, 2 bits spare for future useage
 // float[n][1] => data, first 12 bits are block/model id, next 2 is the plane (0 = top, 1 = side, 2 = front)
 //                  last bit is if its the positive or negative face of that plane
 //                  remaining 17 bits are currently unused
@@ -108,10 +108,6 @@ int main() {
     glUniformBlockBinding(program,glGetUniformBlockIndex(program,"modelData"),0);
 
     camera = new Camera(program,glm::vec3(0,0,-3));
-
-    int width,height;
-    glfwGetFramebufferSize(window,&width,&height);
-    glViewport(0,0,width,height);
 
     glfwSetKeyCallback(window,glfwCharCallback);
     glfwSetCursorPosCallback(window,glfwMousePosCallback);

@@ -3,6 +3,9 @@
 #include "Input.hpp"
 #include "Player.hpp"
 
+#ifndef _Game
+#define _Game
+
 class Game {
 
     public:
@@ -15,3 +18,6 @@ class Game {
         void start();
 };
 
+Game game;
+
+#endif

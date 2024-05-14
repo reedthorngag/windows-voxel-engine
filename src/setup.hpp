@@ -32,6 +32,10 @@ void createWindow() {
         printf("GLEW init failed!\n");
         exit(1);
     }
+
+    int width,height;
+    glfwGetFramebufferSize(window,&width,&height);
+    glViewport(0,0,width,height);
 }
 
 void setupOpenGl() {

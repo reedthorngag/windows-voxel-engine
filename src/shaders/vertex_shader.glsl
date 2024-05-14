@@ -9,6 +9,6 @@ void main() {
     gl_Position = vec4(
         uint(pos) & 0x3ff,
         (uint(pos)>>10) & 0x3ff,
-        (uint(pos)>>20) & 0xfff,
+        (uint(pos)>>20) & 0x3ff,
         data);
 }

@@ -4,7 +4,8 @@
 
 #include "Camera.hpp"
 
-extern GLuint program;
+#ifndef _Player
+#define _Player
 
 class Player {
 
@@ -19,3 +20,5 @@ class Player {
         void move(unsigned int ms);
         void mouseMove(GLFWwindow* win, double x, double y);
 };
+
+#endif
