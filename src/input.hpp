@@ -9,7 +9,7 @@ class Input {
     private:
         Player* activePlayer;
     public:
-        bool keys[255] = { 0 };
+        bool keys[512] = { 0 };
 
         Input();
 

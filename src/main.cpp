@@ -2,11 +2,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
+ #include <iostream>
 #include <stdio.h>
 
-#include "camera.hpp"
 #include "globals.hpp"
 #include "setup.hpp"
 #include "player.hpp"
@@ -63,6 +61,7 @@ void render() {
     glClearColor(0.001,0.001,0.05,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    player->move(1);
     player->camera->updateUniforms();
 
     glUniformMatrix4fv(glGetUniformLocation(global.program, "chunkOffset"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0),glm::vec3(0))));

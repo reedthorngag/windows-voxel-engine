@@ -6,7 +6,7 @@ extern Global global;
 
 Player::Player(glm::vec3 startPos) {
     this->pos = startPos;
-    this->camera = new Camera(global.program, glm::vec3(0,this->height,0));
+    this->camera = new Camera(global.program, glm::vec3(0,0,-3));
 }
 
 Player::~Player() {
@@ -26,5 +26,7 @@ void Player::move(unsigned int ms) {
 }
 
 void Player::mouseMove(GLFWwindow* win, double x, double y) {
-    
+    camera->rotateY((y-HALF_HEIGHT)*0.05);
+    camera->rotateX((HALF_WIDTH-x)*0.05);
+    glfwSetCursorPos(win,HALF_WIDTH,HALF_HEIGHT);
 }

@@ -38,6 +38,8 @@ void createWindow() {
     int width,height;
     glfwGetFramebufferSize(global.window,&width,&height);
     glViewport(0,0,width,height);
+
+    glfwSetInputMode(global.window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void setupOpenGl() {

@@ -9,8 +9,6 @@
 class Game {
 
     public:
-        Input input;
-        Player* player = new Player(glm::vec3(0));
 
         Game();
         ~Game();

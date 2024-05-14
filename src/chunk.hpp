@@ -7,7 +7,7 @@
 #define _CHUNK
 
 struct SubChunk {
-    block blocks[SUB_CHUNK_SIZE][SUB_CHUNK_SIZE][SUB_CHUNK_SIZE] = {};
+    block blocks[1][1][1] = {};
 };
 
 class Chunk {

@@ -15,7 +15,7 @@ void Input::release(unsigned int key) {
 }
 
 void Input::onMouseMove(Player* player) {
-    this->activePlayer = player;
+   this->activePlayer = player;
 }
 
 void Input::glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
