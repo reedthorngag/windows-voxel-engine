@@ -10,21 +10,51 @@
 void Generator::generateChunk(Chunk* chunk) {
 
     for (int x = 0; x < CHUNK_SUB_CHUNKS; x++) {
-        for (int z = 0; z < CHUNK_SUB_CHUNKS; z++) {
-            
-            subChunk* subChunk = new struct subChunk;
+        for (int y = 0; y < CHUNK_SUB_CHUNKS; y++) {
+            for (int z = 0; z < CHUNK_SUB_CHUNKS; z++) {
 
-            for (int x1 = 0; x1 < SUB_CHUNK_SIZE; x1++) {
-                for (int z1 = 0; z1 < SUB_CHUNK_SIZE; z1++) {
+                SubChunk* subChunk = new struct SubChunk;
+                bool chunkSolid = true;
+                bool solidStone = false;
+                bool solidAir = false;
 
-                    double input1 = chunk->pos->x*CHUNK_SIZE + x*SUB_CHUNK_SIZE + x1;
-                    double input2 = chunk->pos->z*CHUNK_SIZE + z*SUB_CHUNK_SIZE + z1;
+                for (int x1 = 0; x1 < SUB_CHUNK_SIZE; x1++) {
+                    for (int z1 = 0; z1 < SUB_CHUNK_SIZE; z1++) {
 
-                    int y = (int)round((genNoise(input1,input2)) + 4);
+                        double input1 = chunk->pos->x*CHUNK_SIZE + x*SUB_CHUNK_SIZE + x1;
+                        double input2 = chunk->pos->z*CHUNK_SIZE + z*SUB_CHUNK_SIZE + z1;
 
-                    subChunk->blocks[x1][y][z1] = block::GRASS;
-                    
+                        int y1 = (int)round((genNoise(input1,input2)) + 4);
+
+                        int subChunkY = y1>>6;
+                        if (subChunkY < y1) {
+                            for (int y2 = SUB_CHUNK_SIZE; y2--;)
+                                subChunk->blocks[x1][y2][z1] = block::STONE;
+                            solidStone = true;
+                            continue;
+                        }
+                        else if (subChunkY > y1) {
+                            solidAir = true;
+                            continue;
+                        }
+                        else chunkSolid = false;
+
+                        int relY = y1 & 0x3ff;
+
+                        subChunk->blocks[x1][relY][z1] = block::GRASS;
+
+                        for (int i = 3; i-- && relY;) 
+                            subChunk->blocks[x1][--relY][z1] = block::DIRT;
+
+                        for (;relY--;)
+                            subChunk->blocks[x1][relY][z1] = block::STONE;
+                        
+                    }
                 }
+
+                if (chunkSolid && (solidStone != solidAir)) {
+                    chunk->subChunks[x][y][z] = (SubChunk*)(subChunk->blocks[0][0][0] & (1LL<<63));
+                } else chunk->subChunks[x][y][z] = subChunk;
             }
         }
     }

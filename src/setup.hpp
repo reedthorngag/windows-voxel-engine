@@ -6,6 +6,8 @@
 #include "shaders/load_shader.hpp"
 #include "globals.hpp"
 
+extern Global global;
+
 void glfwErrorCallback(int errorCode, const char* errorMessage) {
     printf("glfw error: %d %s\n", errorCode, errorMessage);
 }
@@ -20,13 +22,13 @@ void createWindow() {
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Voxel engine v2", NULL, NULL);
-    if (!window) {
+    global.window = glfwCreateWindow(WIDTH, HEIGHT, "Voxel engine v2", NULL, NULL);
+    if (!global.window) {
         printf("Window creation failed!\n");
         exit(1);
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(global.window);
 
     if (glewInit() != GLEW_OK) {
         printf("GLEW init failed!\n");
@@ -34,7 +36,7 @@ void createWindow() {
     }
 
     int width,height;
-    glfwGetFramebufferSize(window,&width,&height);
+    glfwGetFramebufferSize(global.window,&width,&height);
     glViewport(0,0,width,height);
 }
 
@@ -43,51 +45,51 @@ void setupOpenGl() {
     GLuint vertexShader = loadShader("../src/shaders/vertex_shader.glsl",GL_VERTEX_SHADER);
     GLuint geometryShader = loadShader("../src/shaders/geometry_shader.glsl",GL_GEOMETRY_SHADER);
 
-    program = glCreateProgram();
+    global.program = glCreateProgram();
 
-    glAttachShader(program,fragShader);
-    glAttachShader(program,vertexShader);
-    glAttachShader(program,geometryShader);
-    glLinkProgram(program);
+    glAttachShader(global.program,fragShader);
+    glAttachShader(global.program,vertexShader);
+    glAttachShader(global.program,geometryShader);
+    glLinkProgram(global.program);
 
     GLint isLinked = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
+    glGetProgramiv(global.program, GL_LINK_STATUS, (int *)&isLinked);
     if (isLinked == GL_FALSE)
     {
         GLint maxLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+        glGetProgramiv(global.program, GL_INFO_LOG_LENGTH, &maxLength);
 
         char* infoLog = new char[maxLength];
-        glGetProgramInfoLog(program, maxLength, &maxLength, infoLog);
+        glGetProgramInfoLog(global.program, maxLength, &maxLength, infoLog);
         printf("Linking failed! Info log: %s\n",infoLog);
 
         delete[] infoLog;
         glDeleteShader(fragShader);
         glDeleteShader(vertexShader);
         glDeleteShader(geometryShader);
-        glDeleteProgram(program);
+        glDeleteProgram(global.program);
 
         exit(1);
     }
 
-    glValidateProgram(program);
+    glValidateProgram(global.program);
 
     GLint isValid = 0;
-    glGetProgramiv(program, GL_VALIDATE_STATUS, (int *)&isValid);
+    glGetProgramiv(global.program, GL_VALIDATE_STATUS, (int *)&isValid);
     if (isValid == GL_FALSE)
     {
         GLint maxLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+        glGetProgramiv(global.program, GL_INFO_LOG_LENGTH, &maxLength);
 
         char* infoLog = new char[maxLength];
-        glGetProgramInfoLog(program, maxLength, &maxLength, infoLog);
+        glGetProgramInfoLog(global.program, maxLength, &maxLength, infoLog);
         printf("Linking failed! Info log: %s\n",infoLog);
 
         delete[] infoLog;
         glDeleteShader(fragShader);
         glDeleteShader(vertexShader);
         glDeleteShader(geometryShader);
-        glDeleteProgram(program);
+        glDeleteProgram(global.program);
 
         exit(1);
     }

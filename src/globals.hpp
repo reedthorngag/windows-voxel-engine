@@ -18,12 +18,17 @@ const int HEIGHT = 600;
 const double HALF_WIDTH = WIDTH/2.0;
 const double HALF_HEIGHT = HEIGHT/2.0;
 
-GLFWwindow* window;
-GLuint program;
-Game game;
-Generator generator;
+class Global {
 
-glm::vec3 startPos(0);
+    public:
+        GLFWwindow* window;
+        GLuint program;
+        Input input;
+        Game game;
+        Generator generator;
+};
+
+const glm::vec3 startPos(0);
 
 const float speed = 0.05;
 const float speed_scale = 5;
@@ -41,7 +46,7 @@ struct Model {
     unsigned int padding;
 };
 
-Model models[] = {
+const Model _models[] = {
     Model{},
     Model{
         glm::vec3(0,1,0),

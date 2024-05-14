@@ -6,11 +6,12 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "shaders/load_shader.hpp"
 #include "camera.hpp"
-#include "input.hpp"
 #include "globals.hpp"
 #include "setup.hpp"
+#include "player.hpp"
+
+extern Global global;
 
 #pragma pack(1)
 struct Block {
@@ -42,19 +43,18 @@ float faces[][2] = {
     }
 };
 
-Camera* camera;
-Input input;
+Player* player;
 
 inline void glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    input.glfwCharCallback(window,key,scancode,action,mods);
+    global.input.glfwCharCallback(window,key,scancode,action,mods);
 }
 
 inline void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    input.glfwMouseButtonCallback(window,button,action,mods);
+    global.input.glfwMouseButtonCallback(window,button,action,mods);
 }
 
 inline void glfwMousePosCallback(GLFWwindow* window, double x, double y) {
-    input.glfwMousePosCallback(window,x,y);
+    global.input.glfwMousePosCallback(window,x,y);
 }
 
 
@@ -63,9 +63,9 @@ void render() {
     glClearColor(0.001,0.001,0.05,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    camera->updateUniforms();
+    player->camera->updateUniforms();
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "chunkOffset"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0),glm::vec3(0))));
+    glUniformMatrix4fv(glGetUniformLocation(global.program, "chunkOffset"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0),glm::vec3(0))));
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER,VBO);
@@ -85,7 +85,7 @@ int main() {
     createWindow();
     setupOpenGl();
 
-    glUseProgram(program);
+    glUseProgram(global.program);
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1,&VBO);
@@ -105,25 +105,26 @@ int main() {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, UBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(models), models, GL_STATIC_DRAW);
 
-    glUniformBlockBinding(program,glGetUniformBlockIndex(program,"modelData"),0);
+    glUniformBlockBinding(global.program,glGetUniformBlockIndex(global.program,"modelData"),0);
 
-    camera = new Camera(program,glm::vec3(0,0,-3));
+    player = new Player(glm::vec3(0,0,-3));
+    global.input.onMouseMove(player);
 
-    glfwSetKeyCallback(window,glfwCharCallback);
-    glfwSetCursorPosCallback(window,glfwMousePosCallback);
-    glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
+    glfwSetKeyCallback(global.window,glfwCharCallback);
+    glfwSetCursorPosCallback(global.window,glfwMousePosCallback);
+    glfwSetMouseButtonCallback(global.window, glfwMouseButtonCallback);
 
     glfwSwapInterval(1);
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(global.window)) {
         glfwPollEvents();
 
         render();
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(global.window);
     }
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(global.window);
     glfwTerminate();
 }
 

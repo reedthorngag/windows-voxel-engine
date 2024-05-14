@@ -3,7 +3,7 @@
 #include "input.hpp"
 
 Input::Input() {
-    this->mouseCallback;
+    
 }
 
 void Input::press(unsigned int key) {
@@ -14,8 +14,8 @@ void Input::release(unsigned int key) {
     keys[key] = false;
 }
 
-void Input::onMouseMove(void callback(GLFWwindow* win, double x, double y)) {
-    this->mouseCallback = callback;
+void Input::onMouseMove(Player* player) {
+    this->activePlayer = player;
 }
 
 void Input::glfwCharCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -40,5 +40,6 @@ void Input::glfwCharCallback(GLFWwindow* window, int key, int scancode, int acti
 void Input::glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
 
 void Input::glfwMousePosCallback(GLFWwindow* window, double x, double y) {
-    this->mouseCallback(window, x, y);
+    if (this->activePlayer)
+        this->activePlayer->mouseMove(window,x,y);
 }

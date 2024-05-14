@@ -9,5 +9,7 @@ g++ -Wall -g -W -Werror -Wno-unused-parameter -Wno-unused-variable ^
     -L C:\lib\glew\lib\Release\x64 ^
     -L C:\lib\glfw\lib-mingw-w64 ^
     src/*.cpp ^
+    src/generation/*.cpp ^
+    include/*.cpp ^
     -lopengl32 -lglew32 -lglfw3 -lgdi32 ^
     -o bin/output.exe || exit 1

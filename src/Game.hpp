@@ -18,6 +18,4 @@ class Game {
         void start();
 };
 
-Game game;
-
 #endif
