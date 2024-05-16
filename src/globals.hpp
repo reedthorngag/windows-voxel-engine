@@ -8,8 +8,8 @@
 #ifndef _GLOBALS
 #define _GLOBALS
 
-const int CHUNK_SIZE = 1024;
-const int SUB_CHUNK_SIZE = 64;
+const int CHUNK_SIZE = 512;
+const int SUB_CHUNK_SIZE = 32;
 const int CHUNK_SUB_CHUNKS = CHUNK_SIZE/SUB_CHUNK_SIZE;
 
 const int WIDTH = 800;

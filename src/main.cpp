@@ -8,6 +8,7 @@
 #include "globals.hpp"
 #include "setup.hpp"
 #include "player.hpp"
+#include "chunk.hpp"
 
 extern Global global;
 
@@ -105,6 +106,15 @@ int main() {
     glBufferData(GL_UNIFORM_BUFFER, sizeof(models), models, GL_STATIC_DRAW);
 
     glUniformBlockBinding(global.program,glGetUniformBlockIndex(global.program,"modelData"),0);
+
+    printf("generating chunk...\n");
+    double start = glfwGetTime();
+
+    Chunk* chunk = new Chunk(new glm::ivec3(0));
+    global.generator.generateChunk(chunk);
+
+    printf("generated chunk! time: %lf  ",glfwGetTime()-start);
+
 
     player = new Player(glm::vec3(0,0,-3));
     global.input.onMouseMove(player);
