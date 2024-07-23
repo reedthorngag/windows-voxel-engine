@@ -1,5 +1,6 @@
 #include <random>
 #include <math.h>
+#include <stdio.h>
 
 #include "noise.hpp"
 #include "generator.hpp"
@@ -45,7 +46,8 @@ void Generator::generateChunk(Chunk* chunk) {
                             }
                             continue;
                         }
-                        else chunkSolid = false;
+                        
+                        chunkSolid = false;
 
                         int relY = y1 & 0x1f;
 
@@ -61,7 +63,7 @@ void Generator::generateChunk(Chunk* chunk) {
                 }
 
                 if (chunkSolid) {
-                    chunk->subChunks[x][y][z] = (SubChunk)(subChunk[0][0][0] & (1LL<<63));
+                    chunk->subChunks[x][y][z] = (SubChunk)(subChunk[0][0][0] | (1LL<<63));
                     delete subChunk;
                 }
                 else chunk->subChunks[x][y][z] = subChunk;

@@ -112,7 +112,15 @@ int main() {
 
     Chunk* chunk = new Chunk(new glm::ivec3(0));
 
-    printf("generated chunk! time: %lf  ",glfwGetTime()-start);
+    printf("generated chunk! time: %lf  \n",glfwGetTime()-start);
+
+
+    printf("meshing chunk...\n");
+    start = glfwGetTime();
+
+    chunk->generateMesh();
+
+    printf("meshed chunk! time: %lf  \n",glfwGetTime()-start);
 
 
     player = new Player(glm::vec3(0,0,-3));

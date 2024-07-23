@@ -12,6 +12,12 @@ typedef block (*SubChunk)[SUB_CHUNK_SIZE][SUB_CHUNK_SIZE];
 //     block (*blocks)[SUB_CHUNK_SIZE][SUB_CHUNK_SIZE];
 // };
 
+#pragma pack(1)
+struct face {
+    float a;
+    float b;
+};
+
 class Chunk {
     private:
 
@@ -28,6 +34,7 @@ class Chunk {
 
         inline bool subChunkSolid(glm::ivec3 pos);
         inline block getBlock(glm::ivec3 pos);
+        inline block getBlock(int x, int y, int z, int x1, int y1, int z1);
 
         void generateMesh();
 
