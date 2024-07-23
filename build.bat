@@ -12,4 +12,4 @@ g++ -Wall -g -W -Werror -Wno-unused-parameter -Wno-unused-variable ^
     src/generation/*.cpp ^
     include/*.cpp ^
     -lopengl32 -lglew32 -lglfw3 -lgdi32 ^
-    -o bin/output.asm || exit 1
+    -o bin/output.exe || exit 1

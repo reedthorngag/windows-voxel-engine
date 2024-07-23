@@ -14,8 +14,7 @@ void Generator::generateChunk(Chunk* chunk) {
             for (int z = 0; z < CHUNK_SUB_CHUNKS; z++) {
                 block (*subChunk)[SUB_CHUNK_SIZE][SUB_CHUNK_SIZE] = new block[SUB_CHUNK_SIZE][SUB_CHUNK_SIZE][SUB_CHUNK_SIZE]{};
                 bool chunkSolid = true;
-                bool solidStone = false;
-                bool solidAir = false;
+                block lastBlock = block::_NULL;
 
                 for (int x1 = 0; x1 < SUB_CHUNK_SIZE; x1++) {
                     for (int z1 = 0; z1 < SUB_CHUNK_SIZE; z1++) {
@@ -26,19 +25,29 @@ void Generator::generateChunk(Chunk* chunk) {
                         int y1 = (int)round((genNoise(input1,input2)) + 4);
                         
                         int subChunkY = y1>>6;
-                        if (subChunkY < y) {
+                        if (subChunkY > y) {
                             for (int y2 = SUB_CHUNK_SIZE; y2--;)
                                 subChunk[x1][y2][z1] = block::STONE;
-                            solidStone = true;
+                            if (chunkSolid) {
+                                if (lastBlock == block::_NULL)
+                                    lastBlock = block::STONE;
+                                else
+                                    chunkSolid = lastBlock == block::STONE;
+                            }
                             continue;
                         }
-                        else if (subChunkY > y) {
-                            solidAir = true;
+                        else if (subChunkY < y) {
+                            if (chunkSolid) {
+                                if (lastBlock == block::_NULL) {
+                                    lastBlock = block::AIR;
+                                } else
+                                    chunkSolid = lastBlock == block::AIR;
+                            }
                             continue;
                         }
                         else chunkSolid = false;
 
-                        int relY = y1 & 0x3f;
+                        int relY = y1 & 0x1f;
 
                         subChunk[x1][relY][z1] = block::GRASS;
 
@@ -51,8 +60,10 @@ void Generator::generateChunk(Chunk* chunk) {
                     }
                 }
 
-                if (chunkSolid && (solidStone != solidAir))
+                if (chunkSolid) {
                     chunk->subChunks[x][y][z] = (SubChunk)(subChunk[0][0][0] & (1LL<<63));
+                    delete subChunk;
+                }
                 else chunk->subChunks[x][y][z] = subChunk;
             }
         }

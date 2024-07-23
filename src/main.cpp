@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
- #include <iostream>
+#include <iostream>
 #include <stdio.h>
 
 #include "globals.hpp"
@@ -111,7 +111,6 @@ int main() {
     double start = glfwGetTime();
 
     Chunk* chunk = new Chunk(new glm::ivec3(0));
-    global.generator.generateChunk(chunk);
 
     printf("generated chunk! time: %lf  ",glfwGetTime()-start);
 

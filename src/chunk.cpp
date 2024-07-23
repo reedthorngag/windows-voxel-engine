@@ -18,6 +18,10 @@ inline block Chunk::getBlock(glm::ivec3 pos) {
     return subChunk[pos.x&0x3f][pos.y&0x3f][pos.z&0x3f];
 }
 
+void Chunk::generateMesh() {
+    
+}
+
 Chunk::Chunk(glm::ivec3* pos) {
     this->pos = pos;
     global.generator.generateChunk(this);
