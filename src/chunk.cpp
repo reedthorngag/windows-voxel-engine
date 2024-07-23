@@ -24,10 +24,8 @@ inline block Chunk::getBlock(int x, int y, int z, int x1, int y1, int z1) {
     
     if ((long long)subChunk & (1LL<<63))
         return (block)((long long)subChunk & 0xffff);
-    
-    printf("here! %llx\n",(long long)subChunk);
 
-    return subChunk[0][0][0];
+    return subChunk[x1][y1][z1];
 }
 
 inline void addFace(std::vector<face> faces, int x, int y, int z, short blockId, char faceId, bool side) {
@@ -50,25 +48,23 @@ void Chunk::generateMesh() {
                     for (short y1 = 0; y1 < SUB_CHUNK_SIZE; y1++) {
                         for (short z1 = 0; z1 < SUB_CHUNK_SIZE; z1++) {
 
-                            block currBlock = this->getBlock(CHUNK_SUB_CHUNKS-1,CHUNK_SUB_CHUNKS-1,CHUNK_SUB_CHUNKS-1,SUB_CHUNK_SIZE-1,SUB_CHUNK_SIZE-1,SUB_CHUNK_SIZE-1);
-
-                            //block currBlock = this->getBlock(x,y,z,x1,y1,z1);
+                            block currBlock = this->getBlock(x,y,z,x1,y1,z1);
                             int pos[]{(x<<6)+x,(y<<6)+y1,(z<<6)+z1};
                             
-                            // switch (x1) {
-                            //     case SUB_CHUNK_SIZE-1:
-                            //         if (!((SUB_CHUNK_SIZE-1)-x) || this->getBlock(x+1,y,z,0,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,1);
-                            //         if (this->getBlock(x,y,z,x1-1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,0);
-                            //         break;
-                            //     case 0:
-                            //         if (!x || this->getBlock(x-1,y,z,0,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,0);
-                            //         if (this->getBlock(x,y,z,x1+1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,1);
-                            //         break;
-                            //     default:
-                            //         if (this->getBlock(x,y,z,x1+1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,1);
-                            //         if (this->getBlock(x,y,z,x1-1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,0);
-                            //         break;
-                            // }
+                            switch (x1) {
+                                case SUB_CHUNK_SIZE-1:
+                                    // if (!((SUB_CHUNK_SIZE-1)-x) || this->getBlock(x+1,y,z,0,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,1);
+                                    // if (this->getBlock(x,y,z,x1-1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,0);
+                                    break;
+                                case 0:
+                                    // if (!x || this->getBlock(x-1,y,z,0,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,0);
+                                    // if (this->getBlock(x,y,z,x1+1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,1);
+                                    break;
+                                default:
+                                    if (this->getBlock(x,y,z,x1+1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,1);
+                                    if (this->getBlock(x,y,z,x1-1,y1,z1)) addFace(faces,pos[0],pos[1],pos[2],currBlock,1,0);
+                                    break;
+                            }
 
                             // switch (y1) {
                             //     case SUB_CHUNK_SIZE-1:
