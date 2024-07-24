@@ -32,6 +32,8 @@ class Chunk {
         GLuint VAO;
         GLuint VBO;
 
+        int faces;
+
         inline bool subChunkSolid(glm::ivec3 pos);
         inline block getBlock(glm::ivec3 pos);
         inline block getBlock(int x, int y, int z, int x1, int y1, int z1);

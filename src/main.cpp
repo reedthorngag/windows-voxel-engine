@@ -57,6 +57,8 @@ inline void glfwMousePosCallback(GLFWwindow* window, double x, double y) {
 }
 
 
+Chunk* chunk = nullptr;
+
 void render() {
 
     glClearColor(0.001,0.001,0.05,1);
@@ -67,9 +69,11 @@ void render() {
 
     glUniformMatrix4fv(glGetUniformLocation(global.program, "chunkOffset"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0),glm::vec3(0))));
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER,VBO);
-    glDrawArrays(GL_POINTS, 0, 1);
+    printf("\rfaces: %i    ",chunk->faces);
+
+    glBindVertexArray(chunk->VAO);
+    glBindBuffer(GL_ARRAY_BUFFER,chunk->VBO);
+    glDrawArrays(GL_POINTS, 0, chunk->faces);
     glBindVertexArray(0);
 
 }
@@ -110,7 +114,7 @@ int main() {
     printf("generating chunk...\n");
     double start = glfwGetTime();
 
-    Chunk* chunk = new Chunk(new glm::ivec3(0));
+    chunk = new Chunk(new glm::ivec3(0));
 
     printf("generated chunk! time: %lf  \n",glfwGetTime()-start);
 
